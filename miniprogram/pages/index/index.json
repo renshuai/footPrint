@@ -1,1 +1,7 @@
-{}
+{
+  "navigationBarBackgroundColor": "#006699",
+  "navigationBarTextStyle": "#ffffff",
+  "enablePullDownRefresh": false,
+  "onReachBottomDistance": 50,
+  "disableScroll": true
+}
