@@ -2,9 +2,23 @@
 ec-canvas {
   width: 100%;
   flex: 2;
-  border-bottom: 1px solid #eee;
   box-sizing: border-box;
-  background-color: #006699;
+  background-color: #6bd8dd;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10rpx;
+}
+
+.overview {
+  background-color: #6bd8dd;
+  color: #fff;
+  text-align: left;
+  padding: 0 20rpx;
+  font-size: 14px;  
+  width: 100%;
+  position: fixed;
+  left: 0;
+  top: 0;
+  display: none;
 }
 .content-wrap {
   flex: 3;
@@ -19,15 +33,15 @@ ec-canvas {
 .icon-wrap {
   position: absolute;
   right: 20px;
-  border: 1px solid #006699;
-  background-color: #006699;
+  border: 1px solid #6bd8dd;
+  background-color: #6bd8dd;
   border-radius: 100%;
   width: 100rpx;
   height: 100rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 2px 2px 5px #006699;
+  box-shadow: 2px 2px 5px #6bd8dd;
 }
 
 .handle-icon-wrap {
@@ -36,7 +50,7 @@ ec-canvas {
 }
 
 .handle-icon-wrap icon {
-  color: #006699;
+  color: #6bd8dd;
   font-size: 60rpx;
 }
 
@@ -64,7 +78,7 @@ ec-canvas {
 
 .places-item {
   padding: 0 20rpx 20rpx;
-  border-left: 1px solid #006699;
+  border-left: 1px solid #6bd8dd;
   position: relative;
 }
 
@@ -75,7 +89,7 @@ ec-canvas {
   content: '';
   width: 16rpx;
   height: 16rpx;
-  background-color: #006699;
+  background-color: #6bd8dd;
   transform: translate(-50%, -50%);
   border-radius: 100%;
 }

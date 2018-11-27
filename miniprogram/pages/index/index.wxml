@@ -1,6 +1,9 @@
 <!--index.wxml-->
 <view class="container">
   <ec-canvas id="mychart-dom-area" canvas-id="mychart-area" ec="{{ ec }}"></ec-canvas>
+  <view class='overview'>
+    <text>跨越了{{provincesCount}}个省，共{{placesCount}}个地方</text>
+  </view>
   <view class='content-wrap'>
     <view class='places-wrap' wx:if="{{places.length}}">
       <view class='places-item' wx:for="{{places}}">
