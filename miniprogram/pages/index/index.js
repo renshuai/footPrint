@@ -9,7 +9,7 @@ const option = {
     text: '',
     textStyle: {
       color: '#fff',
-      fontSize: 14
+      fontSize: 16
     },
     left: 'center',
     top: 'bottom'
@@ -20,6 +20,7 @@ const option = {
     formatter: '{b}{c}'
   },
   visualMap: {
+    show: false,
     min: 0,
     max: 5,
     left: 'left',
@@ -27,11 +28,11 @@ const option = {
     text: ['高', '低'], // 文本，默认为数值文本
     calculable: true,
     inRange: {
-      color: ['#6bd8dd', '#336666']
+      color: ['#009999', '#000000']
     }
   },
   toolbox: {
-    show: true,
+    show: false,
     orient: 'vertical',
     left: 'right',
     top: 'center',
@@ -61,7 +62,7 @@ const option = {
         areaColor: '#fff',
       },
       emphasis: {
-        areaColor: '#389BB7',
+        areaColor: '#006666',
         borderWidth: 0
       }
     },
@@ -102,16 +103,6 @@ function initChart(canvas, width, height) {
 }
 
 Page({
-  onShareAppMessage: function (res) {
-    const result = this.analysisData();
-    const title = '我的足迹跨域了' + this.data.provincesCount + '个省共' + this.data.placesCount + '个地方，击败了' + Math.floor((this.data.provincesCount / 36 * 100)) + '%的驴友，你呢？';
-    return {
-      title: title,
-      path: '/pages/index/index?openid=' + app.globalData.openid,
-      success: function () { },
-      fail: function () { }
-    }
-  },
   data: {
     ec: {
       onInit: initChart
@@ -122,18 +113,34 @@ Page({
     provincesCount: 0,
     placesCount: 0,
     userOpenId: '',
+    isScrolling: false,
+    isLow: false,
+    notMore: false,
+    scrollTop: 0,
     isSelf: true
   },
-  onReady() {
-    this.initData();
-    this.init_map();
-  },
   onLoad(options) {
-    this.setData({
-      userOpenId: options.openid || app.globalData.openid,
-      isSelf: (!options.openid || options.openid === app.globalData.openid) ? true : false
-    })
-    
+    if (options.openid) {
+      this.setData({
+        userOpenId: options.openid,
+      }, _ => {
+        this.initData();
+        this.init_map();
+      })
+    } else {
+      this.initData();
+      this.init_map();
+    }
+  },
+  onShareAppMessage: function (res) {
+    const result = this.analysisData();
+    const title = '我的足迹跨域了' + this.data.provincesCount + '个省共' + this.data.placesCount + '个地方，击败了' + Math.floor((this.data.provincesCount / 36 * 100)) + '%的驴友，你呢？';
+    return {
+      title: title,
+      path: '/pages/index/index?openid=' + app.globalData.openid,
+      success: function () { },
+      fail: function () { }
+    }
   },
   init_map() {
     this.initMapData().then(res => {
@@ -188,7 +195,7 @@ Page({
       })
     })
   },
-  initData() {
+  initData1() {
     if (this.data.places.length) {
       const places = this.data.places;
       // 跳过现有数据，去加载最新数据
@@ -204,10 +211,14 @@ Page({
           wx.showToast({
             title: '没有更多数据'
           })
+          this.setData({
+            notMore: true
+          })
           return;
         }
         this.setData({
-          places: [...this.data.places, ...res.data]
+          places: [...this.data.places, ...res.data],
+          isLow: false
         }, _ => {
           this.initMapData();
         })
@@ -223,11 +234,68 @@ Page({
           }, _ => {
             this.initMapData();
           })
+        } else {
+          this.setData({
+            notMore: true
+          })
         }
       })
     }
   },
-  initMapData() {
+  initData() {
+    wx.showLoading({
+      title: '加载中'
+    })
+    if (this.data.places.length) {
+      const places = this.data.places;
+      const lastTimestamp = (places[places.length - 1]['timestamp']);
+      wx.cloud.callFunction({
+        name: 'get',
+        data: {
+          lastTimestamp: lastTimestamp,
+          openid: this.data.userOpenId
+        }
+      }).then(res => {
+        wx.hideLoading();
+        if (!res.result.data.length) {
+          wx.showToast({
+            title: '没有更多数据'
+          })
+          this.setData({
+            notMore: true
+          })
+          return;
+        }
+        this.setData({
+          places: [...this.data.places, ...res.result.data],
+          isLow: false
+        }, _ => {
+          this.initMapData();
+        })
+      })
+    } else {
+      wx.cloud.callFunction({
+        name: 'get',
+        data: {
+          openid: this.data.userOpenId
+        }
+      }).then(res => {
+        wx.hideLoading();
+        if (res.result.data.length) {
+          this.setData({
+            places: res.result.data
+          }, _ => {
+            this.initMapData();
+          })
+        } else {
+          this.setData({
+            notMore: true
+          })
+        }
+      })
+    }
+  },
+  initMapData1() {
     const db = wx.cloud.database({
       env: app.globalData.env
     })
@@ -275,22 +343,75 @@ Page({
       }
     })
   },
-  onReachBottom() {
-    // this.getData(false, true);
-    console.log(213);
-  },
-  onPullDownRefresh() {
-    wx.stopPullDownRefresh();
-    this.initData();
-  },
-  more() {
-    this.initData();
-  },
-  share() {
-    wx.showShareMenu({
-      success(res) {
-        console.log(res);
+  initMapData() {
+    return wx.cloud.callFunction({
+      name: 'getMap',
+      data: {
+        openid: this.data.userOpenId
       }
+    }).then(res => {
+      const data = res.result.result.data;
+      // 获取本人的openid，并判断当前页面是否显示本人
+      const openid = res.result.openid;
+      app.globalData.openid = openid;
+      this.setData({
+        isSelf: !this.data.userOpenId || this.data.userOpenId === openid
+      })
+      if (data && data.length) {
+        const provinces = data[0].provinces;
+        const mapData = [];
+        let provincesCount = 0;
+        let placesCount = 0;
+        for (let key in provinces) {
+          mapData.push({
+            name: key,
+            value: provinces[key]
+          })
+          if (provinces[key]) {
+            provincesCount++;
+            placesCount += provinces[key];
+          }
+        }
+        return { mapData, provincesCount, placesCount };
+      } else {
+        return {
+          mapData: [{ name: '北京', value: 0 }, { name: '天津', value: 0 },
+          { name: '上海', value: 0 }, { name: '重庆', value: 0 },
+          { name: '河北', value: 0 }, { name: '河南', value: 0 },
+          { name: '云南', value: 0 }, { name: '辽宁', value: 0 },
+          { name: '黑龙江', value: 0 }, { name: '湖南', value: 0 },
+          { name: '安徽', value: 0 }, { name: '山东', value: 0 },
+          { name: '新疆', value: 0 }, { name: '江苏', value: 0 },
+          { name: '浙江', value: 0 }, { name: '江西', value: 0 },
+          { name: '湖北', value: 0 }, { name: '广西', value: 0 },
+          { name: '甘肃', value: 0 }, { name: '山西', value: 0 },
+          { name: '内蒙古', value: 0 }, { name: '陕西', value: 0 },
+          { name: '吉林', value: 0 }, { name: '福建', value: 0 },
+          { name: '贵州', value: 0 }, { name: '广东', value: 0 },
+          { name: '青海', value: 0 }, { name: '西藏', value: 0 },
+          { name: '四川', value: 0 }, { name: '宁夏', value: 0 },
+          { name: '海南', value: 0 }, { name: '台湾', value: 0 },
+          { name: '香港', value: 0 }, { name: '澳门', value: 0 }],
+          provincesCount: 0,
+          placesCount: 0
+        }
+      }
+    })
+  },
+  lower() {
+    this.setData({
+      isScrolling: true,
+      isLow: true
+    })
+    if (this.data.notMore) {
+      return;
+    }
+    this.initData();
+  },
+  upper() {
+    this.setData({
+      isScrolling: false,
+      isLow: false
     })
   },
   showBtns() {
@@ -308,5 +429,27 @@ Page({
       length: places.length,
       provinces: provinces
     }
+  },
+  scrollViewClick() {
+    this.setData({
+      isScrolling: !this.data.isScrolling,
+      showBtns: false
+    })
+  },
+  mapContainerClick() {
+    this.setData({
+      isScrolling: false,
+      showBtns: false,
+      scrollTop: 0
+    })
+  },
+  generate() {
+    this.setData({
+      userOpenId: app.globalData.openid,
+      places: []
+    }, _ => {
+      this.initData();
+      this.init_map();
+    })
   }
 });

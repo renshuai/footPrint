@@ -1,10 +1,9 @@
 <!--index.wxml-->
 <view class="container">
-  <ec-canvas id="mychart-dom-area" canvas-id="mychart-area" ec="{{ ec }}"></ec-canvas>
-  <view class='overview'>
-    <text>跨越了{{provincesCount}}个省，共{{placesCount}}个地方</text>
+  <view class="map-container {{isScrolling ? 'small-map' : 'big-map'}}" bindtap='mapContainerClick'>
+    <ec-canvas id="mychart-dom-area" canvas-id="mychart-area" ec="{{ ec }}"></ec-canvas>
   </view>
-  <view class='content-wrap'>
+  <scroll-view scroll-y="true" bindscrolltolower="lower" bindscrolltoupper="upper" class="content-wrap" bindtap='scrollViewClick' scroll-top="{{scrollTop}}">
     <view class='places-wrap' wx:if="{{places.length}}">
       <view class='places-item' wx:for="{{places}}">
         <text class='place-name'>{{item.name}}</text>
@@ -13,10 +12,15 @@
         </view>
       </view>
     </view>
-    <view bindtap='more' wx:if="{{places.length && places.length >= limit}}" class='hint'>加载更多</view>
     <view class='no-content' wx:if="{{!places.length}}" >现在还没有数据，赶紧来点亮你的足迹吧！</view>
-  </view>
-  <view class='handle-icon-wrap icon-wrap' bindlongtap='addPrintClick' bindtap='showBtns'>
+    <view class='more-content' wx:if="{{places.length && isLow && !notMore}}">
+      <text>加载中</text>
+    </view>
+    <view wx:if="{{notMore && places.length}}" class='no-more-content'>
+      <text>没有更多数据了</text>
+    </view>
+  </scroll-view>
+  <view class='handle-icon-wrap icon-wrap' bindlongtap='addPrintClick' bindtap='showBtns' wx:if="{{isSelf}}">
     <icon class='iconfont icon-add'></icon>
   </view>
   <view class='add-icon-wrap icon-wrap' bindtap='addPrintClick' wx:if="{{showBtns}}">
@@ -25,6 +29,8 @@
   <button class='share-icon-wrap icon-wrap' open-type='share' wx:if="{{showBtns}}">
     <icon class='iconfont icon-share'></icon>
   </button>
-
+  <view class='generate-wrap' wx:if="{{!isSelf}}">
+    <view class='generate-btn' bindtap='generate'>生成自己的足迹</view>
+  </view>
   
 </view>

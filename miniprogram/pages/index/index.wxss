@@ -1,61 +1,66 @@
 /**index.wxss**/
-ec-canvas {
-  width: 100%;
-  flex: 2;
+.map-container {
   box-sizing: border-box;
-  background-color: #6bd8dd;
+  background-color: #009999;
   border-bottom: 1px solid #eee;
   padding-bottom: 10rpx;
+  transition: all .5s linear;
+  margin-top: -60rpx;
+  width: 100%;
+}
+ec-canvas {
+  width: 100%;
+  height: 100%;
+}
+.small-map {
+  flex: 2;
+}
+.big-map {
+  flex: 4;
 }
 
-.overview {
-  background-color: #6bd8dd;
-  color: #fff;
-  text-align: left;
-  padding: 0 20rpx;
-  font-size: 14px;  
-  width: 100%;
-  position: fixed;
-  left: 0;
-  top: 0;
-  display: none;
-}
 .content-wrap {
-  flex: 3;
+  flex: 4;
   width: 100%;
   text-align: left;
   overflow-y: auto;
   position: relative;
   padding-bottom: 20px;
   box-sizing: border-box;
+  transition: all .5s linear;
+}
+.no-more-content,
+.more-content {
+  text-align: center;
+  font-size: 14px;
 }
 
 .icon-wrap {
   position: absolute;
   right: 20px;
-  border: 1px solid #6bd8dd;
-  background-color: #6bd8dd;
+  border: 1px solid #009999;
+  background-color: #009999;
   border-radius: 100%;
   width: 100rpx;
   height: 100rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 2px 2px 5px #6bd8dd;
+  box-shadow: 2px 2px 5px #009999;
 }
 
 .handle-icon-wrap {
-  bottom: 20rpx;
-  background-color: transparent;
+  bottom: 30rpx;
+  background-color: #fff;
 }
 
 .handle-icon-wrap icon {
-  color: #6bd8dd;
+  color: #009999;
   font-size: 60rpx;
 }
 
 .add-icon-wrap {
-  bottom: 140rpx;
+  bottom: 150rpx;
 }
 
 .add-icon-wrap icon {
@@ -68,7 +73,11 @@ ec-canvas {
 }
 
 .share-icon-wrap {
-  bottom: 260rpx;
+  bottom: 270rpx;
+}
+
+.share-icon-wrap::after {
+  border: none;
 }
 
 .places-wrap {
@@ -77,25 +86,36 @@ ec-canvas {
 }
 
 .places-item {
-  padding: 0 20rpx 20rpx;
-  border-left: 1px solid #6bd8dd;
+  padding: 10px 20rpx 10rpx 30rpx;
+  border-left: 1px solid #009999;
   position: relative;
+  border-bottom: 1px dashed #009999;
+}
+
+.places-item:first-child {
+  border-top: 1px dashed #009999;
 }
 
 .places-item::before {
   position: absolute;
   left: 0;
-  top: 0;
+  top: 0%;
   content: '';
   width: 16rpx;
   height: 16rpx;
-  background-color: #6bd8dd;
+  border: 2px solid #009999;
+  background-color: #fff;
   transform: translate(-50%, -50%);
   border-radius: 100%;
 }
 
+.places-item:first:before {
+  top: 10%;
+}
+
 .place-name {
   margin-bottom: 6rpx;
+  font-weight: 700;
 }
 
 .place-time {
@@ -117,4 +137,28 @@ ec-canvas {
   font-size: 16px;
   text-align: center;
   width: 100%;
+}
+
+.generate-wrap {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100rpx;
+  background-color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 1px -1px 3px #999;
+}
+
+.generate-btn {
+  background-color: #009999;
+  color: #fff;
+  height: 70rpx;
+  line-height: 70rpx;
+  font-size: 14px;
+  border-radius: 35rpx;
+  width: 50%;
+  text-align: center;
 }
