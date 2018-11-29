@@ -32,5 +32,8 @@
   <view class='generate-wrap' wx:if="{{!isSelf}}">
     <view class='generate-btn' bindtap='generate'>生成自己的足迹</view>
   </view>
+  <!-- <form class='form-container' report-submit='true' bindsubmit='submit'>
+    <button type='primary' form-type="submit" size='mini'>发送模板消息</button>
+  </form> -->
   
 </view>

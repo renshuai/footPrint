@@ -1,6 +1,7 @@
 import * as echarts from '../../ec-canvas/echarts';
 import geoJson from './chinaData.js';
 import utils from '../../utils/utils';
+const Bmob = require('../../utils/Bmob-1.6.6.min.js');
 
 const app = getApp();
 
@@ -119,6 +120,10 @@ Page({
     scrollTop: 0,
     isSelf: true
   },
+  onShow() {
+    this.initData();
+    this.init_map();
+  },
   onLoad(options) {
     if (options.openid) {
       this.setData({
@@ -160,23 +165,26 @@ Page({
     });
   },
   addPrintClick() {
-    wx.chooseLocation({
-      success: (res) => {
-        const address = res.address;
-        const provinceRgx = /(北京市|天津市|上海市|重庆市|河北省|河南省|云南省|辽宁省|黑龙江省|湖南省|安徽省|山东省|新疆维吾尔自治区|江苏省|浙江省|江西省|湖北省|广西壮族自治区|甘肃省|山西省|内蒙古自治区|陕西省|吉林省|福建省|贵州省|广东省|青海省|西藏自治区|四川省|宁夏回族自治区|海南省|台湾省|香港特别行政区|澳门特别行政区)/g;
-        const provinceArr = address.match(provinceRgx);
-        if (provinceArr && provinceArr.length) {
-          let province = provinceArr[0];
-          province = province.replace(/[省市(壮族自治区)(维吾尔自治区)(自治区)(回族自治区)(特别行政区)]/g, '');
-          res.province = province;
-        }
-        res['_openid'] = app.globalData.openid;
-        const now = new Date();
-        res.time = utils.formatTime(now);
-        res.timestamp = Date.parse(now);
-        this.addPrint(res);
-      }
+    wx.navigateTo({
+      url: '/pages/form/index'
     })
+    // wx.chooseLocation({
+    //   success: (res) => {
+    //     const address = res.address;
+    //     const provinceRgx = /(北京市|天津市|上海市|重庆市|河北省|河南省|云南省|辽宁省|黑龙江省|湖南省|安徽省|山东省|新疆维吾尔自治区|江苏省|浙江省|江西省|湖北省|广西壮族自治区|甘肃省|山西省|内蒙古自治区|陕西省|吉林省|福建省|贵州省|广东省|青海省|西藏自治区|四川省|宁夏回族自治区|海南省|台湾省|香港特别行政区|澳门特别行政区)/g;
+    //     const provinceArr = address.match(provinceRgx);
+    //     if (provinceArr && provinceArr.length) {
+    //       let province = provinceArr[0];
+    //       province = province.replace(/[省市(壮族自治区)(维吾尔自治区)(自治区)(回族自治区)(特别行政区)]/g, '');
+    //       res.province = province;
+    //     }
+    //     res['_openid'] = app.globalData.openid;
+    //     const now = new Date();
+    //     res.time = utils.formatTime(now);
+    //     res.timestamp = Date.parse(now);
+    //     this.addPrint(res);
+    //   }
+    // })
   },
   addPrint(data) {
     wx.cloud.callFunction({
@@ -243,6 +251,7 @@ Page({
     }
   },
   initData() {
+    console.log('加载');
     wx.showLoading({
       title: '加载中'
     })
@@ -432,7 +441,6 @@ Page({
   },
   scrollViewClick() {
     this.setData({
-      isScrolling: !this.data.isScrolling,
       showBtns: false
     })
   },
@@ -451,5 +459,45 @@ Page({
       this.initData();
       this.init_map();
     })
+  },
+  submit(e) {
+    const formId = e.detail.formId;
+    if (formId) {
+      let modelData = {
+        "touser": app.globalData.openid,
+        "template_id": "3cBuw6FOdjZvLXux0BI4TKkz7PVAS-UZ-HOAq5hYFbc",
+        "page": "/pages/index/index",
+        "form_id": formId,
+        "data": {
+          "keyword1": {
+            "value": "每日点亮足迹吧",
+            "color": "#173177"
+          },
+          "keyword2": {
+            "value": "每天点亮足迹，并分享给好友吧"
+          },
+          "keyword3": {
+            "value": "当前签到次数为1次，加油哦"
+          }
+        }
+        , "emphasis_keyword": ""
+      }
+      
+
+      Bmob.sendWeAppMessage(modelData).then(function (response) {
+        console.log(response);
+      }).catch(function (error) {
+        console.log(error);
+      });
+      
+      // wx.cloud.callFunction({
+      //   name: 'send',
+      //   data: {
+      //     modelData: modelData
+      //   }
+      // }).then(res => {
+      //   console.log(res);
+      // })
+    }
   }
 });

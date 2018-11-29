@@ -11,26 +11,26 @@ const db = cloud.database();
 // 云函数入口函数
 exports.main = async (event, context) => {
   const wxContext = cloud.getWXContext()
-  const data = event.data;
+  const location = event.location;
   try {
     const res = await db.collection('places').add({
       // data 字段表示需新增的 JSON 数据
-      data: data
+      data: location
     })
     // 将数据同时放到overview的数据中
 
     let count = await db.collection('overviews').where({
-      '_openid': data['_openid']
+      '_openid': location['_openid']
     }).count();
     if (count.total > 0) {
       return await db.collection('overviews').where({
-        '_openid': data['_openid']
+        '_openid': location['_openid']
       }).get().then(async (result) => {
         if (result.data.length) {
           let overviewInfo = result.data[0];
-          overviewInfo['provinces'][data.province] += 1;
+          overviewInfo['provinces'][location.province] += 1;
           return await db.collection('overviews').where({
-            '_openid': data['_openid']
+            '_openid': location['_openid']
           }).update({
             data: {
               provinces: overviewInfo['provinces']
@@ -76,11 +76,11 @@ exports.main = async (event, context) => {
         '广西': 0,
         '湖北': 0
       };
-      provinces[data.province] = 1;
+      provinces[location.province] = 1;
       console.log(provinces);
       return await db.collection('overviews').add({
         data: {
-          '_openid': data['_openid'],
+          '_openid': location['_openid'],
           'provinces': provinces
         }
       })

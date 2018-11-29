@@ -1,0 +1,35 @@
+<!--miniprogram/pages/form/index.wxml-->
+<view class='page-container'>  
+  <textarea placeholder='点亮足迹的这一刻想说点啥（非必填）' auto-height="true" class='text-content' bindblur='bindTextAreaBlur' value='{{content}}'></textarea>
+  <view class='photos-wrap'>
+    <image wx:if="{{images.length}}" wx:for="{{images}}" src='{{item}}' mode='aspectFit' bindlongtap='delete' data-index='{{index}}' bindtap='preview'></image>
+        <view class='upload-btn' bindtap='upload' wx:if="{{images.length < 9}}"><icon class='iconfont icon-add'></icon></view>
+  </view>
+  <view class='map-container' wx:if="{{location}}">
+    <view class='map-wrap'>
+      <map longitude="{{location.longitude}}" latitude="{{location.latitude}}" markers='{{[{latitude: location.latitude, longitude: location.longitude}]}}'></map>
+    </view>
+    <view class='map-text-wrap'>
+      <text class='place-name'>地址： {{location.name}}</text>
+      <text class='change-place-btn' bindtap='chooseLocation'>更改位置</text>
+    </view>
+  </view>
+  <view class='time-container' wx:if="{{false}}">
+    <picker mode="date" value="{{date}}" bindchange="bindDateChange">
+      <view class="picker">
+        {{date}}
+      </view>
+    </picker>
+    <picker mode="time" value="{{time}}" start="09:01" end="21:01" bindchange="bindTimeChange">
+      <view class="picker">
+        {{time}}
+      </view>
+    </picker>
+  </view>
+  <form report-submit='true' bindsubmit='submit'>
+    <view class='form-container' >
+      <button form-type="submit" class='submit-btn'>点亮足迹</button>
+      <button class='cancel-btn' bindtap='cancel'>取消发布</button>
+    </view>
+  </form>
+</view>
