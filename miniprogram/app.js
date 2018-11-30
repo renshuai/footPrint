@@ -45,7 +45,8 @@ App({
     userInfo: null,
     openid: '',
     env: 'footprint-46e6ce',
-    limit: 20
+    limit: 20,
+    addInterval: 20 * 1000 //添加的1分钟限制
   },
   getUserOpenId() {
     wx.cloud.init({

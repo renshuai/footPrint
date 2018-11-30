@@ -3,7 +3,7 @@
   <view class="map-container {{isScrolling ? 'small-map' : 'big-map'}}" bindtap='mapContainerClick'>
     <ec-canvas id="mychart-dom-area" canvas-id="mychart-area" ec="{{ ec }}"></ec-canvas>
   </view>
-  <scroll-view scroll-y="true" bindscrolltolower="lower" bindscrolltoupper="upper" class="content-wrap" bindtap='scrollViewClick' scroll-top="{{scrollTop}}">
+  <scroll-view scroll-y="true" class="content-wrap" bindtap='scrollViewClick' scroll-top="{{scrollTop}}">
     <view class='places-wrap' wx:if="{{places.length}}">
       <view class='places-item' wx:for="{{places}}">
         <text class='place-name'>{{item.name}}</text>
@@ -20,13 +20,13 @@
       <text>没有更多数据了</text>
     </view>
   </scroll-view>
-  <view class='handle-icon-wrap icon-wrap' bindlongtap='addPrintClick' bindtap='showBtns' wx:if="{{isSelf}}">
+  <!-- <view class='handle-icon-wrap icon-wrap' bindlongtap='addPrintClick' bindtap='showBtns' wx:if="{{isSelf}}">
     <icon class='iconfont icon-add'></icon>
   </view>
   <view class='add-icon-wrap icon-wrap' bindtap='addPrintClick' wx:if="{{showBtns}}">
     <icon class='iconfont icon-zuji'></icon>
-  </view>
-  <button class='share-icon-wrap icon-wrap' open-type='share' wx:if="{{showBtns}}">
+  </view> -->
+  <button class='share-icon-wrap icon-wrap' open-type='share' wx:if="{{isSelf}}">
     <icon class='iconfont icon-share'></icon>
   </button>
   <view class='generate-wrap' wx:if="{{!isSelf}}">

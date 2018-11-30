@@ -73,7 +73,7 @@ ec-canvas {
 }
 
 .share-icon-wrap {
-  bottom: 270rpx;
+  bottom: 30rpx;
 }
 
 .share-icon-wrap::after {
@@ -89,17 +89,17 @@ ec-canvas {
   padding: 10px 20rpx 10rpx 30rpx;
   border-left: 1px solid #009999;
   position: relative;
-  border-bottom: 1px dashed #009999;
+  border-bottom: 1px dashed #eee;
 }
 
 .places-item:first-child {
-  border-top: 1px dashed #009999;
+  border-top: 1px dashed #eee;
 }
 
 .places-item::before {
   position: absolute;
   left: 0;
-  top: 0%;
+  top: 36%;
   content: '';
   width: 16rpx;
   height: 16rpx;

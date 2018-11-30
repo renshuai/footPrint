@@ -158,7 +158,7 @@ Page({
     wx.cloud.callFunction({
       name: 'add',
       data: {
-        location: location
+        data: location
       }
     }).then(res => {
       wx.navigateBack({

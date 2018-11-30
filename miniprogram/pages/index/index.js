@@ -29,7 +29,7 @@ const option = {
     text: ['高', '低'], // 文本，默认为数值文本
     calculable: true,
     inRange: {
-      color: ['#009999', '#000000']
+      color: ['#009999', '#003333']
     }
   },
   toolbox: {
@@ -118,11 +118,9 @@ Page({
     isLow: false,
     notMore: false,
     scrollTop: 0,
-    isSelf: true
-  },
-  onShow() {
-    this.initData();
-    this.init_map();
+    isSelf: true,
+    // 是否可以添加，做了1分钟限制
+    canAdd: true
   },
   onLoad(options) {
     if (options.openid) {
@@ -136,6 +134,7 @@ Page({
       this.initData();
       this.init_map();
     }
+    this.initShake();
   },
   onShareAppMessage: function (res) {
     const result = this.analysisData();
@@ -197,61 +196,16 @@ Page({
         places: [data, ...this.data.places]
       }, _ => {
         this.init_map();
+        wx.hideLoading();
         wx.showToast({
           title: '签到成功',
+        });
+        wx.startAccelerometer({
         });
       })
     })
   },
-  initData1() {
-    if (this.data.places.length) {
-      const places = this.data.places;
-      // 跳过现有数据，去加载最新数据
-      const db = wx.cloud.database({
-        env: app.globalData.env
-      })
-      const lastTimestamp = (places[places.length - 1]['timestamp']);
-      const command = db.command;
-      db.collection('places').orderBy('timestamp', 'desc').where({
-        timestamp: command.lt(lastTimestamp)
-      }).get().then(res => {
-        if (!res.data.length) {
-          wx.showToast({
-            title: '没有更多数据'
-          })
-          this.setData({
-            notMore: true
-          })
-          return;
-        }
-        this.setData({
-          places: [...this.data.places, ...res.data],
-          isLow: false
-        }, _ => {
-          this.initMapData();
-        })
-      })
-    } else {
-      const db = wx.cloud.database({
-        env: app.globalData.env
-      })
-      db.collection('places').orderBy('timestamp', 'desc').get().then(res => {
-        if (res.data.length) {
-          this.setData({
-            places: res.data
-          }, _ => {
-            this.initMapData();
-          })
-        } else {
-          this.setData({
-            notMore: true
-          })
-        }
-      })
-    }
-  },
   initData() {
-    console.log('加载');
     wx.showLoading({
       title: '加载中'
     })
@@ -303,54 +257,6 @@ Page({
         }
       })
     }
-  },
-  initMapData1() {
-    const db = wx.cloud.database({
-      env: app.globalData.env
-    })
-    return db.collection('overviews').get().then(res => {
-      console.log(res);
-      const data = res.data;
-      if (data && data.length) {
-        const provinces = data[0].provinces;
-        const mapData = [];
-        let provincesCount = 0;
-        let placesCount = 0;
-        for (let key in provinces) {
-          mapData.push({
-            name: key,
-            value: provinces[key]
-          })
-          if (provinces[key]) {
-            provincesCount++;
-            placesCount += provinces[key];
-          }
-        }
-        return {mapData, provincesCount, placesCount};
-      } else {
-        return {
-          mapData: [{ name: '北京', value: 0 }, { name: '天津', value: 0 },
-          { name: '上海', value: 0 }, { name: '重庆', value: 0 },
-          { name: '河北', value: 0 }, { name: '河南', value: 0 },
-          { name: '云南', value: 0 }, { name: '辽宁', value: 0 },
-          { name: '黑龙江', value: 0 }, { name: '湖南', value: 0 },
-          { name: '安徽', value: 0 }, { name: '山东', value: 0 },
-          { name: '新疆', value: 0 }, { name: '江苏', value: 0 },
-          { name: '浙江', value: 0 }, { name: '江西', value: 0 },
-          { name: '湖北', value: 0 }, { name: '广西', value: 0 },
-          { name: '甘肃', value: 0 }, { name: '山西', value: 0 },
-          { name: '内蒙古', value: 0 }, { name: '陕西', value: 0 },
-          { name: '吉林', value: 0 }, { name: '福建', value: 0 },
-          { name: '贵州', value: 0 }, { name: '广东', value: 0 },
-          { name: '青海', value: 0 }, { name: '西藏', value: 0 },
-          { name: '四川', value: 0 }, { name: '宁夏', value: 0 },
-          { name: '海南', value: 0 }, { name: '台湾', value: 0 },
-          { name: '香港', value: 0 }, { name: '澳门', value: 0 }],
-          provincesCount: 0,
-          placesCount: 0
-        }
-      }
-    })
   },
   initMapData() {
     return wx.cloud.callFunction({
@@ -499,5 +405,111 @@ Page({
       //   console.log(res);
       // })
     }
-  }
+  },
+  // 初始化摇一摇签到功能
+  initShake() {
+    const self = this;
+    wx.onAccelerometerChange(function (res) {
+      // 达到一定得晃动程度才执行
+      if (Math.abs(res.x) > 0.7 && Math.abs(res.y) > 0.7) {
+        if (!self.data.canAdd) {
+          wx.showToast({
+            title: '过一会再来添加',
+          })
+          return;
+        }
+        self.setData({
+          canAdd: false
+        })
+        setTimeout(_ => {
+          self.setData({
+            canAdd: true
+          })
+        }, app.globalData.addInterval)
+        // 获取用户的位置
+        wx.stopAccelerometer({
+          success: _ => {
+            wx.showLoading({
+              title: '点亮足迹中'
+            });
+            wx.getLocation({
+              success: function (res) {
+                self.getDetailPosition(res).then(result => {
+                  console.log(result);
+                  if (result.data.status === 0) {
+                    self.handlePosition(result.data.result);
+                  }
+                });
+              },
+            })    
+          }
+        })
+      }
+    })
+  },
+  handlePosition(result) {
+    const data = {
+      _openid: app.globalData.openid,
+      address: result.address,
+      content: '',
+      filelds: []
+    };
+    let province = result.address_component.province;
+    province = province.replace(/[省市(壮族自治区)(维吾尔自治区)(自治区)(回族自治区)(特别行政区)]/g, '');
+    data.province = province;
+    const now = new Date();
+    data.time = utils.formatTime(now).complete;
+    data.timestamp = Date.parse(now);
+    if (result.address_reference) {
+      const reference = result.address_reference;
+      if (reference.famous_area && reference.famous_area.title) {
+        data.latitude = reference.famous_area.location.lat;
+        data.longitude = reference.famous_area.location.lng;
+        data.name = reference.famous_area.title;
+      } else if (reference.business_area && reference.business_area.title) {
+        data.latitude = reference.business_area.location.lat;
+        data.longitude = reference.business_area.location.lng;
+        data.name = reference.business_area.title;
+      } else if (reference.landmark_l2 && reference.landmark_l2.title) {
+        data.latitude = reference.landmark_l2.location.lat;
+        data.longitude = reference.landmark_l2.location.lng;
+        data.name = reference.landmark_l2.title;
+      } else if (reference.landmark_l1 && reference.landmark_l1.title) {
+        data.latitude = reference.landmark_l1.location.lat;
+        data.longitude = reference.landmark_l1.location.lng;
+        data.name = reference.landmark_l1.title;
+      } else if (reference.landmark_l1 && reference.landmark_l1.title) {
+        data.latitude = reference.landmark_l1.location.lat;
+        data.longitude = reference.landmark_l1.location.lng;
+        data.name = reference.landmark_l1.title;
+      } 
+    } else if (result.pois && result.pois.length) {
+      const poi = result.pois[0];
+      data.latitude = poi.location.lat;
+      data.longitude = poi.location.lng;
+      data.name = poi['title'];
+    } else if (result.location) {
+      data.latitude = result.location.lat;
+      data.longitude = result.location.lng;
+      let address_component = result.address_component;
+      data.name = address_component.street || address_component.district || address_component.city;
+    }
+    this.addPrint(data);
+  },
+  getDetailPosition(obj) {
+    return new Promise((resolve, reject) => {
+      const self = this;
+      wx.request({
+        url: 'https://apis.map.qq.com/ws/geocoder/v1/?location=' + obj.latitude + ',' + obj.longitude + '&key=NI2BZ-RZFCP-A4DD7-LNHD4-YTVAO-DJFGY&get_poi=1',
+        success: res => {
+          resolve(res);
+        },
+        fail: msg => {
+          wx.showToast({
+            title: msg
+          })
+        }
+      })
+    })
+  },
 });
