@@ -5,14 +5,29 @@
   </view>
   <scroll-view scroll-y="true" class="content-wrap" bindtap='scrollViewClick' scroll-top="{{scrollTop}}">
     <view class='places-wrap' wx:if="{{places.length}}">
-      <view class='places-item' wx:for="{{places}}">
+      <!-- <view class='places-item' wx:for="{{places}}">
         <text class='place-name'>{{item.name}}</text>
         <view class='place-time'>
           <text>{{item.time}}</text>
         </view>
+      </view> -->
+      <view class='place-item' wx:for="{{places}}">
+        <view class='time-wrap'>
+          <block wx:if="{{item.date}}">
+            <text class='time'>{{item.time}}</text>
+            <text class='date'>{{item.date}}</text>
+          </block>
+          <view class='place-icon-wrap'>
+            <icon class="iconfont place-icon {{item.class || 'icon-didian01'}}"></icon>
+          </view>
+          <text wx:if="{{!item.date}}">{{item.time}}</text>
+        </view>
+        <view class='name-wrap'>
+          <text>{{item.name}}</text>
+        </view>
       </view>
     </view>
-    <view class='no-content' wx:if="{{!places.length}}" >现在还没有数据，赶紧来点亮你的足迹吧！</view>
+    <view class='no-content' wx:if="{{!places.length}}" >赶紧晃动手机点亮你的足迹吧！</view>
     <view class='more-content' wx:if="{{places.length && isLow && !notMore}}">
       <text>加载中</text>
     </view>

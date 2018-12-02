@@ -158,7 +158,7 @@ Page({
       if (res.placesCount) {
         option.title.text = '跨越了' + res.provincesCount + '省，共去过' + res.placesCount + '个地方';
       } else {
-        option.title.text = '当前还没有点亮任何足迹，加油！'
+        option.title.text = '赶快晃动手机来点亮你的足迹吧'
       }
       chart.setOption(option);
     });
@@ -203,6 +203,8 @@ Page({
         wx.startAccelerometer({
         });
       })
+    }).catch(_ => {
+        wx.hideLoading();
     })
   },
   initData() {
@@ -433,6 +435,7 @@ Page({
               title: '点亮足迹中'
             });
             wx.getLocation({
+              type: 'gcj02',
               success: function (res) {
                 self.getDetailPosition(res).then(result => {
                   console.log(result);
@@ -441,6 +444,9 @@ Page({
                   }
                 });
               },
+              fail: _ => {
+                wx.hideLoading();
+              }
             })    
           }
         })
@@ -458,9 +464,21 @@ Page({
     province = province.replace(/[省市(壮族自治区)(维吾尔自治区)(自治区)(回族自治区)(特别行政区)]/g, '');
     data.province = province;
     const now = new Date();
-    data.time = utils.formatTime(now).complete;
+    data.time = utils.formatTime(now).time;
+    data.date = utils.formatTime(now).date;
     data.timestamp = Date.parse(now);
-    if (result.address_reference) {
+    if(result.pois && result.pois.length) {
+      const poi = result.pois[0];
+      data.latitude = poi.location.lat;
+      data.longitude = poi.location.lng;
+      data.name = poi['title'];
+      if (poi.category) {
+        const iconClass  = this.getCategoryClass(poi.category);
+        if (iconClass) {
+          data.class = iconClass;
+        }
+      }
+    } else if (result.address_reference) {
       const reference = result.address_reference;
       if (reference.famous_area && reference.famous_area.title) {
         data.latitude = reference.famous_area.location.lat;
@@ -483,17 +501,13 @@ Page({
         data.longitude = reference.landmark_l1.location.lng;
         data.name = reference.landmark_l1.title;
       } 
-    } else if (result.pois && result.pois.length) {
-      const poi = result.pois[0];
-      data.latitude = poi.location.lat;
-      data.longitude = poi.location.lng;
-      data.name = poi['title'];
     } else if (result.location) {
       data.latitude = result.location.lat;
       data.longitude = result.location.lng;
       let address_component = result.address_component;
       data.name = address_component.street || address_component.district || address_component.city;
     }
+    data.class = data.class || 'icon-didian01';
     this.addPrint(data);
   },
   getDetailPosition(obj) {
@@ -505,6 +519,7 @@ Page({
           resolve(res);
         },
         fail: msg => {
+          wx.hideLoading();
           wx.showToast({
             title: msg
           })
@@ -512,4 +527,376 @@ Page({
       })
     })
   },
+  getCategoryClass(category) {
+    // let type = '';
+    let iconClass = '';
+    const typeObj = {
+      '美食': {
+        children: {
+          '中餐厅': {
+            'class': 'icon-zhongcan'
+          },
+          '日本料理': {
+            'class': ''
+          },
+          '西餐': {
+            'class': 'icon-canpinhui-xican'
+          },
+          '烧烤': {
+            'class': ''
+          },
+          '火锅': {
+            'class': 'icon-hotpot'
+          },
+          '海鲜': {
+            'class': ''
+          },
+          '素食': {
+            'class': ''
+          },
+          '清真': {
+            'class': ''
+          },
+          '自助餐': {
+            'class': ''
+          },
+          '面包甜点': {
+            'class': ''
+          },
+          '冷饮店': {
+            'class': ''
+          },
+          '小吃快餐': {
+            'class': ''
+          }
+        },
+        type: 'food',
+        class: 'icon-canpinhui-xican',
+        'getFormChildren': false
+      },
+      '购物': {
+        children: {
+          '综合商场': {
+            'class': ''
+          },
+          '便利店': {
+            'class': ''
+          },
+          '超市': {
+            'class': ''
+          },
+          '数码家电': {
+            'class': ''
+          },
+          '花鸟鱼虫': {
+            'class': ''
+          },
+          '家具家居建材': {
+            'class': ''
+          },
+          '农贸市场': {
+            'class': ''
+          },
+          '小商品市场': {
+            'class': ''
+          },
+          '旧货市场': {
+            'class': ''
+          },
+          '体育户外': {
+            'class': ''
+          },
+          '服饰鞋包': {
+            'class': ''
+          },
+          '图书音像': {
+            'class': ''
+          },
+          '眼镜店': {
+            'class': ''
+          },
+          '母婴儿童': {
+            'class': ''
+          },
+          '珠宝饰品': {
+            'class': ''
+          },
+          '化妆品': {
+            'class': ''
+          },
+          '礼品': {
+            'class': ''
+          },
+          '摄影器材': {
+            'class': ''
+          },
+          '拍卖典当行': {
+            'class': ''
+          },
+          '古玩字画': {
+            'class': ''
+          },
+          '自行车专卖': {
+            'class': ''
+          },
+          '烟酒专卖': {
+            'class': ''
+          },
+          '文化用品': {
+            'class': ''
+          }
+        },
+        type: 'shopping',
+        class: 'icon-xiazai49',
+        'getFormChildren': false
+      },
+      '生活服务': {
+        children: {
+          '旅行社': {
+            'class': ''
+          },
+          '票务代售': {
+            'class': 'icon-huochezhan'
+          },
+          '邮局速递': {
+            'class': 'icon-kuaidi'
+          },
+          '通讯服务': {
+            'class': 'icon-yunyingshang'
+          },
+          '报刊亭': {
+            'class': 'icon-iconset0184'
+          },
+          '自来水营业厅': {
+            'class': ''
+          },
+          '电力营业厅': {
+            'class': ''
+          },
+          '摄影冲印': {
+            'class': ''
+          },
+          '洗衣店': {
+            'class': ''
+          },
+          '招聘求职': {
+            'class': ''
+          },
+          '彩票': {
+            'class': ''
+          },
+          '家政': {
+            'class': ''
+          },
+          '中介机构': {
+            'class': ''
+          },
+          '宠物服务': {
+            'class': ''
+          },
+          '废品收购站': {
+            'class': ''
+          },
+          '福利院养老院': {
+            'class': ''
+          },
+          '美容美发': {
+            'class': ''
+          }
+        },
+        type: 'service',
+        class: 'icon-fuwuzhongjiewuye',
+        'getFormChildren': true
+      },
+      '娱乐休闲': {
+        children: {
+          '洗浴推拿足疗': {
+            'class': ''
+          },
+          'KTV': {
+            'class': 'icon-yule'
+          },
+          '酒吧': {
+            'class': 'icon-jiuba'
+          },
+          '咖啡厅': {
+            'class': 'icon-kafei'
+          },
+          '夜总会': {
+            'class': ''
+          },
+          '电影院': {
+            'class': 'icon-dianyingyuan'
+          },
+          '剧场音乐厅': {
+            'class': 'icon-yinle'
+          },
+          '度假疗养': {
+            'class': ''
+          },
+          '游乐场': {
+            'class': ''
+          },
+          '垂钓园': {
+            'class': ''
+          },
+          '采摘园': {
+            'class': ''
+          },
+          '游戏厅': {
+            'class': ''
+          },
+          '棋牌室': {
+            'class': ''
+          },
+          '网吧': {
+            'class': ''
+          }
+        },
+        type: 'entertainment',
+        class: 'icon-yule',
+        'getFormChildren': true
+      },
+      '汽车': {
+         children: {
+            '加油站': {
+              'class': 'icon-jiayouzhan'
+            },
+            '停车场': {
+             'class': ''
+            },
+            '汽车销售': {
+             'class': ''
+            },
+            '汽车维修': {
+              'class': 'icon-weixiu'
+            },
+            '摩托车': {
+             'class': ''
+            },
+            '汽车养护': {
+             'class': ''
+            },
+            '洗车场': {
+              'class': 'icon-xichekaidan'
+            }
+         },
+        type: 'car',
+        class: 'icon-qiche',
+        'getFormChildren': true
+      },
+      '医疗保健': {
+        type: 'hospital',
+        class: 'icon-yiyuan',
+        'getFormChildren': false
+      },
+      '酒店宾馆': {
+        type: 'hotel',
+        class: 'icon-hotel',
+        'getFormChildren': false
+      },
+      '旅游景点': {
+        type: 'tourism',
+        class: 'icon-jingdian',
+        'getFormChildren': false
+      },
+      '文化场馆': {
+        type: 'museum',
+        class: 'icon-bowuguan',
+        'getFormChildren': false
+      },
+      '教育学校': {
+        type: 'school',
+        class: 'icon-xuexiao',
+        'getFormChildren': false
+      },
+      '银行金融': {
+        type: 'bank',
+        class: 'icon-iconset0291',
+        'getFormChildren': false
+      },
+      '基础设施': {
+        children: {
+          '公交车站': {
+            'class': ''
+          },
+          '地铁站': {
+            'class': ''
+          },
+          '火车站': {
+            'class': 'icon-huochezhan'
+          },
+          '长途汽车站': {
+            'class': ''
+          },
+          '公交线路': {
+            'class': ''
+          },
+          '地铁线路': {
+            'class': ''
+          },
+          '公共厕所': {
+            'class': 'icon-cesuo'
+          },
+          '公用电话': {
+            'class': 'icon-icon-tel'
+          },
+          '紧急避难场所': {
+            'class': ''
+          },
+          '收费站': {
+            'class': 'icon-shoufeizhan'
+          },
+          '服务区': {
+            'class': 'icon-fuwuqu'
+          },
+          '其它基础设施': {
+            'class': ''
+          }
+        },
+        type: 'basic',
+        class: 'icon-jianshe',
+        'getFormChildren': true
+      },
+      '房产小区': {
+        children: {
+          '住宅小区': {
+            'class': 'icon-haofangtuo400iconfont2xiaoqu'
+          },
+          '别墅': {
+            'class': ''
+          },
+          '宿舍': {
+            'class': ''
+          },
+          '社区中心': {
+            'class': ''
+          },
+          '商务楼宇': {
+            'class': ''
+          }
+        },
+        type: 'apartment',
+        class: 'icon-haofangtuo400iconfont2xiaoqu',
+        'getFormChildren': false
+      }
+    }
+    for (let key in typeObj) {
+      if (category.startsWith(key)) {
+        if (typeObj[key]['getFormChildren'] && typeObj[key]['children']) {
+          const children = typeObj[key]['children'];
+          for (let childKey in children) {
+            if (category.includes(childKey)) {
+              iconClass = children[childKey]['class'] || typeObj[key]['class'];
+              break;
+            }
+          }
+        } else {
+          iconClass = typeObj[key]['class'];
+        }
+        break;
+      } 
+    }
+    return iconClass;
+  }
 });

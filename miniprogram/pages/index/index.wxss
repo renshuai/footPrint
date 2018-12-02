@@ -81,7 +81,7 @@ ec-canvas {
 }
 
 .places-wrap {
-  padding: 20rpx;
+  /* padding: 20rpx; */
   font-size: 16px;
 }
 
@@ -161,4 +161,58 @@ ec-canvas {
   border-radius: 35rpx;
   width: 50%;
   text-align: center;
+}
+
+.place-item {
+  display: flex;
+  align-items: center;
+}
+
+.place-item .time-wrap {
+  padding: 20rpx 40rpx 20rpx 20rpx;
+  display: flex;
+  flex-direction: column;
+  border-right: 2px solid #009999;
+  position: relative;
+  
+}
+
+.time-wrap text {
+  text-align: center;
+}
+
+.time-wrap .time {
+  font-size: 16px;
+  color: #333;
+}
+
+.time-wrap .date {
+  font-size: 14px;
+  color: #999;
+  margin-top: -8rpx;
+}
+
+.place-item .name-wrap {
+  flex: 1;
+  padding-left: 40rpx;
+}
+.place-icon-wrap {
+  width: 50rpx;
+  height: 50rpx;
+  border: 1px solid #009999;
+  border-radius: 100%;
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translate(50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #fff;
+}
+.place-icon {
+  display: block;
+  font-size: 36rpx;
+  color: #009999;
+  margin-top: -10rpx;
 }
