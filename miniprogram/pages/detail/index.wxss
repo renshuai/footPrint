@@ -102,4 +102,5 @@
   flex: 1;
   border: 1px solid #009999;
   background-color: #fff;
+  color: #009999;
 }

@@ -13,17 +13,13 @@ exports.main = async (event, context) => {
   const wxContext = cloud.getWXContext()
   const location = event.data;
   try {
-    const res = await db.collection('places').add({
-      // data 字段表示需新增的 JSON 数据
-      data: location
-    })
     // 将数据同时放到overview的数据中
 
     let count = await db.collection('overviews').where({
       '_openid': location['_openid']
     }).count();
     if (count.total > 0) {
-      return await db.collection('overviews').where({
+      await db.collection('overviews').where({
         '_openid': location['_openid']
       }).get().then(async (result) => {
         if (result.data.length) {
@@ -78,13 +74,17 @@ exports.main = async (event, context) => {
       };
       provinces[location.province] = 1;
       console.log(provinces);
-      return await db.collection('overviews').add({
+      await db.collection('overviews').add({
         data: {
           '_openid': location['_openid'],
           'provinces': provinces
         }
       })
     }
+    return await db.collection('places').add({
+      // data 字段表示需新增的 JSON 数据
+      data: location
+    })
   } catch (e) {
     console.error(e)
   }

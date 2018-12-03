@@ -1,6 +1,6 @@
 <!--index.wxml-->
 <view class="container">
-  <view class="map-container {{isScrolling ? 'small-map' : 'big-map'}}" bindtap='mapContainerClick'>
+  <view class="map-container big-map">
     <ec-canvas id="mychart-dom-area" canvas-id="mychart-area" ec="{{ ec }}"></ec-canvas>
   </view>
   <scroll-view scroll-y="true" class="content-wrap" bindtap='scrollViewClick' scroll-top="{{scrollTop}}">

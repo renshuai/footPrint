@@ -129,11 +129,9 @@ Page({
         userOpenId: options.openid,
       }, _ => {
         this.initData();
-        // this.init_map();
       })
     } else {
       this.initData();
-      // this.init_map();
     }
     this.initShake();
   },
@@ -164,28 +162,6 @@ Page({
       chart.setOption(option);
     });
   },
-  addPrintClick() {
-    wx.navigateTo({
-      url: '/pages/form/index'
-    })
-    // wx.chooseLocation({
-    //   success: (res) => {
-    //     const address = res.address;
-    //     const provinceRgx = /(北京市|天津市|上海市|重庆市|河北省|河南省|云南省|辽宁省|黑龙江省|湖南省|安徽省|山东省|新疆维吾尔自治区|江苏省|浙江省|江西省|湖北省|广西壮族自治区|甘肃省|山西省|内蒙古自治区|陕西省|吉林省|福建省|贵州省|广东省|青海省|西藏自治区|四川省|宁夏回族自治区|海南省|台湾省|香港特别行政区|澳门特别行政区)/g;
-    //     const provinceArr = address.match(provinceRgx);
-    //     if (provinceArr && provinceArr.length) {
-    //       let province = provinceArr[0];
-    //       province = province.replace(/[省市(壮族自治区)(维吾尔自治区)(自治区)(回族自治区)(特别行政区)]/g, '');
-    //       res.province = province;
-    //     }
-    //     res['_openid'] = app.globalData.openid;
-    //     const now = new Date();
-    //     res.time = utils.formatTime(now);
-    //     res.timestamp = Date.parse(now);
-    //     this.addPrint(res);
-    //   }
-    // })
-  },
   addPrint(data) {
     wx.cloud.callFunction({
       name: 'add',
@@ -193,17 +169,20 @@ Page({
         data: data
       }
     }).then(res => {
-      this.setData({
-        places: [data, ...this.data.places]
-      }, _ => {
-        this.init_map();
-        wx.hideLoading();
-        wx.showToast({
-          title: '签到成功',
-        });
-        wx.startAccelerometer({
-        });
-      })
+      if (res.result && res.result._id) {
+        data._id = res.result._id;
+        this.setData({
+          places: [data, ...this.data.places]
+        }, _ => {
+          this.init_map();
+          wx.hideLoading();
+          wx.showToast({
+            title: '签到成功',
+          });
+          wx.startAccelerometer({
+          });
+        })
+      }
     }).catch(_ => {
         wx.hideLoading();
         wx.showToast({
@@ -386,8 +365,7 @@ Page({
   },
   scrollViewClick() {
     this.setData({
-      showBtns: false,
-      handleIndex: -1
+      showBtns: false
     })
   },
   mapContainerClick() {
@@ -451,7 +429,7 @@ Page({
     const self = this;
     wx.onAccelerometerChange(function (res) {
       // 达到一定得晃动程度才执行
-      if (Math.abs(res.x) > 0.7 && Math.abs(res.y) > 0.7) {
+      if (Math.abs(res.x) > 1 && Math.abs(res.y) > 1) {
         if (!self.data.canAdd) {
           wx.showToast({
             title: '过一会再来添加',
@@ -584,36 +562,36 @@ Page({
             'class': 'icon-canpinhui-xican'
           },
           '烧烤': {
-            'class': ''
+            'class': 'icon-shaokao'
           },
           '火锅': {
             'class': 'icon-hotpot'
           },
           '海鲜': {
-            'class': ''
+            'class': 'icon-haixian'
           },
           '素食': {
-            'class': ''
+            'class': 'icon-jinkoupengdiaosushi'
           },
           '清真': {
-            'class': ''
+            'class': 'icon-lvyoujianzhumingshenggujitourism-daqingzhensi'
           },
           '自助餐': {
             'class': ''
           },
           '面包甜点': {
-            'class': ''
+            'class': 'icon-cake'
           },
           '冷饮店': {
-            'class': ''
+            'class': 'icon-lengyin'
           },
           '小吃快餐': {
-            'class': ''
+            'class': 'icon-kuaican'
           }
         },
         type: 'food',
         class: 'icon-canpinhui-xican',
-        'getFormChildren': false
+        'getFormChildren': true
       },
       '购物': {
         children: {
@@ -621,70 +599,70 @@ Page({
             'class': ''
           },
           '便利店': {
-            'class': ''
+            'class': 'icon-bianlidian'
           },
           '超市': {
-            'class': ''
+            'class': 'icon-chaoshi'
           },
           '数码家电': {
-            'class': ''
+            'class': 'icon-shuma'
           },
           '花鸟鱼虫': {
-            'class': ''
+            'class': 'icon-hua'
           },
           '家具家居建材': {
-            'class': ''
+            'class': 'icon-jiaju'
           },
           '农贸市场': {
-            'class': ''
+            'class': 'icon-shucai'
           },
           '小商品市场': {
             'class': ''
           },
           '旧货市场': {
-            'class': ''
+            'class': 'icon-ershoushebei'
           },
           '体育户外': {
-            'class': ''
+            'class': 'icon-yundong'
           },
           '服饰鞋包': {
-            'class': ''
+            'class': 'icon-yifu'
           },
           '图书音像': {
-            'class': ''
+            'class': 'icon-tushu'
           },
           '眼镜店': {
-            'class': ''
+            'class': 'icon-yanjing'
           },
           '母婴儿童': {
-            'class': ''
+            'class': 'icon-muying'
           },
           '珠宝饰品': {
-            'class': ''
+            'class': 'icon-zhubao'
           },
           '化妆品': {
-            'class': ''
+            'class': 'icon-huazhuangpin'
           },
           '礼品': {
-            'class': ''
+            'class': 'icon-shangpin'
           },
           '摄影器材': {
-            'class': ''
+            'class': 'icon-sheying'
           },
           '拍卖典当行': {
-            'class': ''
+            'class': 'icon-paimai'
           },
           '古玩字画': {
-            'class': ''
+            'class': 'icon-guwan'
           },
           '自行车专卖': {
-            'class': ''
+            'class': 'icon-zihangche'
           },
           '烟酒专卖': {
-            'class': ''
+            'class': 'icon-xiangyan'
           },
           '文化用品': {
-            'class': ''
+            'class': 'icon-wenhuayuandi'
           }
         },
         type: 'shopping',
@@ -709,40 +687,40 @@ Page({
             'class': 'icon-iconset0184'
           },
           '自来水营业厅': {
-            'class': ''
+            'class': 'icon-shuilongtou'
           },
           '电力营业厅': {
-            'class': ''
+            'class': 'icon-electricity_icon'
           },
           '摄影冲印': {
-            'class': ''
+            'class': 'icon-dayin'
           },
           '洗衣店': {
-            'class': ''
+            'class': 'icon-xiyiji'
           },
           '招聘求职': {
-            'class': ''
+            'class': 'icon-zhaopin'
           },
           '彩票': {
-            'class': ''
+            'class': 'icon-caipiao'
           },
           '家政': {
-            'class': ''
+            'class': 'icon-swticonjiazheng'
           },
           '中介机构': {
-            'class': ''
+            'class': 'icon-fuwu'
           },
           '宠物服务': {
-            'class': ''
+            'class': 'icon-chongwu'
           },
           '废品收购站': {
-            'class': ''
+            'class': 'icon-lajigarbage7'
           },
           '福利院养老院': {
-            'class': ''
+            'class': 'icon-laoren'
           },
           '美容美发': {
-            'class': ''
+            'class': 'icon-meifa'
           }
         },
         type: 'service',
@@ -752,7 +730,7 @@ Page({
       '娱乐休闲': {
         children: {
           '洗浴推拿足疗': {
-            'class': ''
+            'class': 'icon-Massage'
           },
           'KTV': {
             'class': 'icon-yule'
@@ -776,22 +754,22 @@ Page({
             'class': ''
           },
           '游乐场': {
-            'class': ''
+            'class': 'icon-youlechang'
           },
           '垂钓园': {
-            'class': ''
+            'class': 'icon-Fishing'
           },
           '采摘园': {
-            'class': ''
+            'class': 'icon-rengongcaizhai'
           },
           '游戏厅': {
-            'class': ''
+            'class': 'icon-youxi'
           },
           '棋牌室': {
-            'class': ''
+            'class': 'icon-qipaishi'
           },
           '网吧': {
-            'class': ''
+            'class': 'icon-shubiao'
           }
         },
         type: 'entertainment',
@@ -804,7 +782,7 @@ Page({
               'class': 'icon-jiayouzhan'
             },
             '停车场': {
-             'class': ''
+              'class': 'icon-tingchechang'
             },
             '汽车销售': {
              'class': ''
@@ -813,7 +791,7 @@ Page({
               'class': 'icon-weixiu'
             },
             '摩托车': {
-             'class': ''
+              'class': 'icon-motuoche'
             },
             '汽车养护': {
              'class': ''
@@ -859,22 +837,22 @@ Page({
       '基础设施': {
         children: {
           '公交车站': {
-            'class': ''
+            'class': 'icon-gongjiaozhan'
           },
           '地铁站': {
-            'class': ''
+            'class': 'icon-ditiexiao'
           },
           '火车站': {
             'class': 'icon-huochezhan'
           },
           '长途汽车站': {
-            'class': ''
+            'class': 'icon-qichezhantianchong'
           },
           '公交线路': {
-            'class': ''
+            'class': 'icon-gongjiaoxianlu'
           },
           '地铁线路': {
-            'class': ''
+            'class': 'icon-changyonglogo15'
           },
           '公共厕所': {
             'class': 'icon-cesuo'
@@ -883,7 +861,7 @@ Page({
             'class': 'icon-icon-tel'
           },
           '紧急避难场所': {
-            'class': ''
+            'class': 'icon-guangchangsquare107'
           },
           '收费站': {
             'class': 'icon-shoufeizhan'
@@ -892,7 +870,7 @@ Page({
             'class': 'icon-fuwuqu'
           },
           '其它基础设施': {
-            'class': ''
+            'class': 'icon-erji-jichusheshi'
           }
         },
         type: 'basic',
@@ -905,20 +883,25 @@ Page({
             'class': 'icon-haofangtuo400iconfont2xiaoqu'
           },
           '别墅': {
-            'class': ''
+            'class': 'icon-bieshu'
           },
           '宿舍': {
-            'class': ''
+            'class': 'icon-sushe'
           },
           '社区中心': {
-            'class': ''
+            'class': 'icon-shequ'
           },
           '商务楼宇': {
-            'class': ''
+            'class': 'icon-icon-'
           }
         },
         type: 'apartment',
         class: 'icon-haofangtuo400iconfont2xiaoqu',
+        'getFormChildren': false
+      },
+      '公司企业': {
+        type: 'company',
+        class: 'icon-iconset0291',
         'getFormChildren': false
       }
     }
