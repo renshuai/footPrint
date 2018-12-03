@@ -206,6 +206,9 @@ Page({
       })
     }).catch(_ => {
         wx.hideLoading();
+        wx.showToast({
+          title: '签到失败'
+        })
     })
   },
   initData() {
@@ -223,7 +226,7 @@ Page({
         }
       }).then(res => {
         wx.hideLoading();
-        if (!res.result.data.length) {
+        if (!res.result.data || !res.result.data.length) {
           wx.showToast({
             title: '没有更多数据'
           })
@@ -238,6 +241,11 @@ Page({
         }, _ => {
           this.init_map();
         })
+      }).catch(error => {
+        wx.hideLoading();
+        wx.showToast({
+          title: '数据加载失败'
+        })
       })
     } else {
       wx.cloud.callFunction({
@@ -247,14 +255,19 @@ Page({
         }
       }).then(res => {
         wx.hideLoading();
-        if (res.result.data.length) {
+        if (res.result.data && res.result.data.length) {
           this.setData({
             places: res.result.data
           }, _ => {
             this.init_map();
           })
         }
-      })
+        }).catch(error => {
+          wx.hideLoading();
+          wx.showToast({
+            title: '数据加载失败'
+          })
+        })
     }
   },
   initMapData() {
@@ -264,7 +277,29 @@ Page({
         openid: this.data.userOpenId
       }
     }).then(res => {
-      console.log(res);
+      if (!res.result || !res.result.result) {
+        return {
+          mapData: [{ name: '北京', value: 0 }, { name: '天津', value: 0 },
+          { name: '上海', value: 0 }, { name: '重庆', value: 0 },
+          { name: '河北', value: 0 }, { name: '河南', value: 0 },
+          { name: '云南', value: 0 }, { name: '辽宁', value: 0 },
+          { name: '黑龙江', value: 0 }, { name: '湖南', value: 0 },
+          { name: '安徽', value: 0 }, { name: '山东', value: 0 },
+          { name: '新疆', value: 0 }, { name: '江苏', value: 0 },
+          { name: '浙江', value: 0 }, { name: '江西', value: 0 },
+          { name: '湖北', value: 0 }, { name: '广西', value: 0 },
+          { name: '甘肃', value: 0 }, { name: '山西', value: 0 },
+          { name: '内蒙古', value: 0 }, { name: '陕西', value: 0 },
+          { name: '吉林', value: 0 }, { name: '福建', value: 0 },
+          { name: '贵州', value: 0 }, { name: '广东', value: 0 },
+          { name: '青海', value: 0 }, { name: '西藏', value: 0 },
+          { name: '四川', value: 0 }, { name: '宁夏', value: 0 },
+          { name: '海南', value: 0 }, { name: '台湾', value: 0 },
+          { name: '香港', value: 0 }, { name: '澳门', value: 0 }],
+          provincesCount: 0,
+          placesCount: 0
+        }
+      }
       const data = res.result.result.data;
       // 获取本人的openid，并判断当前页面是否显示本人
       const openid = res.result.openid;
@@ -311,6 +346,10 @@ Page({
           placesCount: 0
         }
       }
+    }).catch(error => {
+      wx.showToast({
+        title: '数据加载失败'
+      })
     })
   },
   lower() {
@@ -445,6 +484,9 @@ Page({
               },
               fail: _ => {
                 wx.hideLoading();
+                wx.showToast({
+                  title: '获取位置失败'
+                })
               }
             })    
           }
@@ -949,6 +991,11 @@ Page({
       wx.hideLoading();
       wx.showToast({
         title: '删除成功'
+      })
+    }).catch(error => {
+      wx.hideLoading();
+      wx.showToast({
+        title: '删除失败'
       })
     });
   },
