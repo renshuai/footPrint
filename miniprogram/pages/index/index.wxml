@@ -22,8 +22,16 @@
           </view>
           <text wx:if="{{!item.date}}">{{item.time}}</text>
         </view>
-        <view class='name-wrap'>
-          <text>{{item.name}}</text>
+        <view class='content-image-wrap' wx:if="{{item.content || item.fileIds.length}}">
+            <icon class='iconfont icon-tupian' wx:if="{{item.fileIds.length}}"></icon>
+            <icon class='iconfont icon-wenzi' wx:if="{{item.content}}"></icon>
+          </view>
+        <view class='name-wrap' bindtouchstart='touchStart' bindtouchend='touchEnd' data-index="{{index}}">
+          {{item.name}}
+          <view class='handle-wrap' wx:if="{{handleIndex === index}}">
+            <view class='detail-btn' bindtap='showDetail' data-index="{{index}}"><text>详情</text></view>
+            <view class='delete-btn' bindtap='delete' data-index="{{index}}" wx:if="{{isSelf}}"><text>删除</text></view>
+          </view>
         </view>
       </view>
     </view>

@@ -1,10 +1,10 @@
 @font-face {
   font-family: 'iconfont';  /* project id 936205 */
-  src: url('//at.alicdn.com/t/font_936205_8xmzv8e5y19.eot');
-  src: url('//at.alicdn.com/t/font_936205_8xmzv8e5y19.eot?#iefix') format('embedded-opentype'),
-  url('//at.alicdn.com/t/font_936205_8xmzv8e5y19.woff') format('woff'),
-  url('//at.alicdn.com/t/font_936205_8xmzv8e5y19.ttf') format('truetype'),
-  url('//at.alicdn.com/t/font_936205_8xmzv8e5y19.svg#iconfont') format('svg');
+  src: url('//at.alicdn.com/t/font_936205_8v61rbf2x4p.eot');
+  src: url('//at.alicdn.com/t/font_936205_8v61rbf2x4p.eot?#iefix') format('embedded-opentype'),
+  url('//at.alicdn.com/t/font_936205_8v61rbf2x4p.woff') format('woff'),
+  url('//at.alicdn.com/t/font_936205_8v61rbf2x4p.ttf') format('truetype'),
+  url('//at.alicdn.com/t/font_936205_8v61rbf2x4p.svg#iconfont') format('svg');
 }
 
 .iconfont {
@@ -96,4 +96,8 @@
 .icon-qiche:before { content: "\ec6d"; }
 
 .icon-kuaidi:before { content: "\e621"; }
+
+.icon-wenzi:before { content: "\e617"; }
+
+.icon-tupian:before { content: "\e60d"; }
 

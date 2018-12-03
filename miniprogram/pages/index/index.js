@@ -120,7 +120,8 @@ Page({
     scrollTop: 0,
     isSelf: true,
     // 是否可以添加，做了1分钟限制
-    canAdd: true
+    canAdd: true,
+    handleIndex: -1
   },
   onLoad(options) {
     if (options.openid) {
@@ -128,11 +129,11 @@ Page({
         userOpenId: options.openid,
       }, _ => {
         this.initData();
-        this.init_map();
+        // this.init_map();
       })
     } else {
       this.initData();
-      this.init_map();
+      // this.init_map();
     }
     this.initShake();
   },
@@ -235,7 +236,7 @@ Page({
           places: [...this.data.places, ...res.result.data],
           isLow: false
         }, _ => {
-          this.initMapData();
+          this.init_map();
         })
       })
     } else {
@@ -250,11 +251,7 @@ Page({
           this.setData({
             places: res.result.data
           }, _ => {
-            this.initMapData();
-          })
-        } else {
-          this.setData({
-            notMore: true
+            this.init_map();
           })
         }
       })
@@ -267,6 +264,7 @@ Page({
         openid: this.data.userOpenId
       }
     }).then(res => {
+      console.log(res);
       const data = res.result.result.data;
       // 获取本人的openid，并判断当前页面是否显示本人
       const openid = res.result.openid;
@@ -349,7 +347,8 @@ Page({
   },
   scrollViewClick() {
     this.setData({
-      showBtns: false
+      showBtns: false,
+      handleIndex: -1
     })
   },
   mapContainerClick() {
@@ -458,7 +457,7 @@ Page({
       _openid: app.globalData.openid,
       address: result.address,
       content: '',
-      filelds: []
+      fileIds: []
     };
     let province = result.address_component.province;
     province = province.replace(/[省市(壮族自治区)(维吾尔自治区)(自治区)(回族自治区)(特别行政区)]/g, '');
@@ -898,5 +897,69 @@ Page({
       } 
     }
     return iconClass;
+  },
+  touchStart(e) {
+    const touch = e.touches[0];
+    this.setData({
+      startX: touch.pageX,
+      startY: touch.pageY
+    })
+  },
+  touchMove(e) {
+  },
+  touchEnd(e) {
+    const touch = e.changedTouches[0];
+    const diffX = touch.pageX - this.data.startX;
+    const diffY = touch.pageY - this.data.startY;
+    if (diffX < 0) {
+      // 左滑
+      if (Math.abs(diffX) > 30 && Math.abs(diffY) < 30) {
+        // 超过一定距离，触发事件
+        const index = e.target.dataset.index;
+        this.setData({
+          handleIndex: index
+        })
+      } 
+    } else {
+      this.setData({
+        handleIndex: -1
+      })
+    }
+  },
+  delete(e) {
+    wx.showLoading({
+      title: '删除中'
+    })
+    const index = e.currentTarget.dataset.index;
+    const deleteData = this.data.places[index];
+    const _id = deleteData['_id'];
+    // 删除places集合对应的数据
+    wx.cloud.callFunction({
+      name: 'delete',
+      data: {
+        id: _id
+      }
+    }).then(res => {
+      this.init_map();
+      const places = JSON.parse(JSON.stringify(this.data.places));
+      places.splice(index, 1);
+      this.setData({
+        places: places
+      })
+      wx.hideLoading();
+      wx.showToast({
+        title: '删除成功'
+      })
+    });
+  },
+  showDetail(e) {
+    console.log(e);
+    const index = e.currentTarget.dataset.index;
+    const detailData = this.data.places[index];
+    console.log(detailData);
+    const _id = detailData['_id'];
+    wx.navigateTo({
+      url: '/pages/detail/index?id=' + _id + '&isSelf=' + this.data.isSelf
+    })
   }
 });

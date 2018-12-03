@@ -1,0 +1,105 @@
+/* miniprogram/pages/form/index.wxss */
+.page-container {
+  padding: 40rpx;
+}
+.text-content {
+  margin-bottom: 30rpx;
+  font-size: 16px;
+}
+.photos-wrap {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+}
+
+.photos-wrap view,
+.photos-wrap image {
+  width: 214rpx;
+  height: 214rpx;
+  border: 1px solid #ddd;
+  margin: 0 14rpx 14rpx 0;
+  box-sizing: border-box;
+}
+
+.photos-wrap view {
+  margin-right: 0;
+}
+
+.photos-wrap image:nth-child(3n) {
+  margin-right: 0;
+}
+
+.upload-wrap {
+  padding-bottom: 0;
+}
+
+.upload-btn {
+  line-height: 200rpx;
+  text-align: center;
+}
+
+.upload-btn icon {
+  font-size: 30px;  
+}
+.map-container {
+  margin-top: 30rpx;
+}
+.map-wrap {
+  width: 100%;
+  height: 300rpx;
+}
+
+.map-wrap map{
+  width: 100%;
+  height: 100%;
+}
+
+.map-text-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 14px;
+  margin-top: 10rpx;
+}
+
+.place-name {
+  color: #aaa;
+}
+
+.change-place-btn {
+  color: #009999;
+}
+
+.time-container {
+  display: flex;
+  align-items: center;
+}
+.time-container picker {
+  flex: 1;
+}
+
+.form-container {
+  display: flex;
+  align-items: center;
+  margin-top: 80rpx;
+  flex-direction: row;
+  width: 100%;
+}
+.submit-btn {
+  flex: 2;
+  background-color: #009999;
+  color: #fff;
+  margin-right: 40rpx; 
+}
+
+.submit-btn-hover {
+  background-color: #006666;
+} 
+
+.cancel-btn {
+  flex: 1;
+  border: 1px solid #009999;
+  background-color: #fff;
+}

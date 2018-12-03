@@ -166,15 +166,19 @@ ec-canvas {
 .place-item {
   display: flex;
   align-items: center;
+  height: 112rpx;
 }
 
 .place-item .time-wrap {
-  padding: 20rpx 40rpx 20rpx 20rpx;
+  height: 100%;
+  padding: 0 40rpx 0 20rpx;
   display: flex;
+  align-items: center;
+  justify-content: center;
   flex-direction: column;
   border-right: 2px solid #009999;
   position: relative;
-  
+  margin-right: 40rpx;
 }
 
 .time-wrap text {
@@ -193,8 +197,49 @@ ec-canvas {
 }
 
 .place-item .name-wrap {
+  height: 100%;
   flex: 1;
-  padding-left: 40rpx;
+  min-height: 50rpx;
+  position: relative;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.content-image-wrap {
+  color: #009999;
+  margin-top: -12rpx;
+}
+.content-image-wrap .iconfont {
+  font-size: 14px;
+  margin-right: 10rpx;
+}
+.content-image-wrap .iconfont.icon-wenzi {
+  margin-right: 5rpx;
+}
+.name-wrap .handle-wrap {
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+.handle-wrap view {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  color: #fff;
+  padding: 0 30rpx;
+}
+.handle-wrap .detail-btn {
+  background-color: #009999;
+}
+
+.handle-wrap .delete-btn {
+  background-color: #ff0000;
 }
 .place-icon-wrap {
   width: 50rpx;
